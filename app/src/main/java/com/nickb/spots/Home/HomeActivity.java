@@ -13,6 +13,8 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nickb.spots.R;
 import com.nickb.spots.Utils.BottomNavigationViewHelper;
 import com.nickb.spots.Utils.SectionsPagerAdapter;
+import com.nickb.spots.Utils.UniversalImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -34,9 +36,19 @@ public class HomeActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.viewpager_container);
 
         Log.d(TAG, "onCreate: Starting.");
+
+        initImageLoader();
+
+
         setupBottomNavigationView();
         setupViewPager();
 
+    }
+
+    // method that initialises the image loader, assigning the context and using the helper method
+    private void initImageLoader(){
+        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
+        ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 
 

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/purple">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:id="@+id/relLayout1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="Register a new account"
+                android:textAllCaps="true"
+                android:layout_centerInParent="true"
+                android:lineHeight="80dp"
+                android:textAlignment="center"
+                android:textColor="@color/white">
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/relLayout2"
+            android:layout_below="@+id/relLayout1">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="25dp"
+                android:paddingEnd="25dp"
+                android:orientation="vertical">
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:textColorHint="@color/white"
+                        android:textColor="@color/white"
+                        >
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textEmailAddress"
+                            android:hint="Email"
+                            android:id="@+id/input_email">
+
+                        </EditText>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:textColorHint="@color/white"
+                    android:textColor="@color/white">
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:hint="Name"
+                        android:id="@+id/input_username">
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:textColorHint="@color/white"
+                        android:textColor="@color/white">
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword"
+                            android:hint="Password"
+                            android:id="@+id/input_password">
+                        </EditText>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/button_register"
+                    android:text="Register"
+                    android:padding="12dp"
+                    android:background="@drawable/white_rounded_button">
+                </android.support.v7.widget.AppCompatButton>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:text="Create account"
+                    android:gravity="center"
+                    android:textSize="16dp"
+                    android:textColor="@color/grey">
+
+                </TextView>
+
+                </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/progressBar"
+        android:layout_centerInParent="true">
+
+    </ProgressBar>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please wait..."
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:layout_alignBottom="@+id/progressBar"
+        android:layout_centerHorizontal="true">
+
+    </TextView>
+
+
+</RelativeLayout>
