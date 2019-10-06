@@ -1,15 +1,22 @@
 package com.nickb.spots.Home;
 
 import android.content.Context;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.nickb.spots.Login.LoginActivity;
 import com.nickb.spots.R;
 import com.nickb.spots.Utils.BottomNavigationViewHelper;
 import com.nickb.spots.Utils.SectionsPagerAdapter;
@@ -24,6 +31,10 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     private Context mContext = HomeActivity.this;
 
+    // firebase
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
 
     private ViewPager mViewPager;
 
@@ -32,18 +43,20 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_view);
+        Log.d(TAG, "onCreate: Starting.");
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager_container);
 
-        Log.d(TAG, "onCreate: Starting.");
-
+        setupFirebaseAuth();
         initImageLoader();
-
-
         setupBottomNavigationView();
         setupViewPager();
 
     }
+
+
+
+
 
     // method that initialises the image loader, assigning the context and using the helper method
     private void initImageLoader(){
@@ -88,6 +101,56 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
 
+    }
+
+
+    // ----------------- Firebase ------------------
+
+
+    private void checkCurrentUser(FirebaseUser user) {
+        Log.d(TAG, "checkCurrentUser: checking is user is logged in");
+        if( user == null ) {
+            // not logged in navigate to login
+            Intent intent = new Intent(mContext, LoginActivity.class);
+            startActivity(intent);
+        }
+    }
+
+
+
+    private void setupFirebaseAuth() {
+        Log.d(TAG, "setupFirebaseAuth: ");
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // ses a state listener to see if user logs in or logs out
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull final FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                checkCurrentUser(user);
+                if (null != user) {
+                    // user is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
+                    //onSignedInInitialize(user);
+                } else {
+                    // user signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out: ");
+
+                    //onSignedOutCleanup();
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mAuth.addAuthStateListener(mAuthStateListener);
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
     }
 
 

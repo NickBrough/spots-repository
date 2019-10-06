@@ -2,9 +2,9 @@ package com.nickb.spots.Profile;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +21,6 @@ import com.nickb.spots.Utils.BottomNavigationViewHelper;
 import com.nickb.spots.Utils.SectionsStatePagerAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AccountSettingsActivity extends AppCompatActivity {
 
