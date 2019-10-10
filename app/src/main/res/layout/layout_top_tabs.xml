@@ -1,12 +1,10 @@
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true">
-
-
-
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -15,6 +13,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tabs"
+                app:tabTextColor="@color/grey"
+                app:tabSelectedTextColor="@color/white"
                 android:background="@color/purple">
 
             </com.google.android.material.tabs.TabLayout>

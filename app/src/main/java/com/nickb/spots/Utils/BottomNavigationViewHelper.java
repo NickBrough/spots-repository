@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.nickb.spots.Camera.CameraActivity;
+import com.nickb.spots.Share.ShareActivity;
 import com.nickb.spots.Home.HomeActivity;
 import com.nickb.spots.Profile.ProfileActivity;
 import com.nickb.spots.R;
@@ -37,7 +37,7 @@ public class BottomNavigationViewHelper {
                         context.startActivity(intent1);
                         break;
                     case R.id.ic_camera:
-                        Intent intent2 = new Intent(context, CameraActivity.class); //ACTIVITY_NUM = 1
+                        Intent intent2 = new Intent(context, ShareActivity.class); //ACTIVITY_NUM = 1
                         context.startActivity(intent2);
                         break;
                     case R.id.ic_user:

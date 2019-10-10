@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvName"
+            android:id="@+id/display_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -50,11 +50,12 @@
             android:rating="4"
             android:scaleX="0.6"
             android:scaleY="0.6"
+            android:isIndicator="true"
             android:progressTint="@color/purple"
             app:layout_constraintEnd_toStartOf="@+id/textSpots"
             app:layout_constraintHorizontal_bias="0.43"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvName" />
+            app:layout_constraintTop_toBottomOf="@+id/display_name" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -51,7 +51,6 @@ public class HomeActivity extends AppCompatActivity {
         initImageLoader();
         setupBottomNavigationView();
         setupViewPager();
-
     }
 
 
@@ -76,7 +75,7 @@ public class HomeActivity extends AppCompatActivity {
         adapter.addFragment(new MapViewFragment());
         mViewPager.setAdapter(adapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
 
@@ -108,7 +107,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void checkCurrentUser(FirebaseUser user) {
-        Log.d(TAG, "checkCurrentUser: checking is user is logged in");
+        Log.d(TAG, "checkCurrentUser: checking if user is logged in");
         if( user == null ) {
             // not logged in navigate to login
             Intent intent = new Intent(mContext, LoginActivity.class);
@@ -127,7 +126,7 @@ public class HomeActivity extends AppCompatActivity {
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull final FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                FirebaseUser user = mAuth.getCurrentUser();
                 checkCurrentUser(user);
                 if (null != user) {
                     // user is signed in
@@ -141,6 +140,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         };
+
     }
 
     @Override
@@ -150,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthStateListener);
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-//        updateUI(currentUser);
+        checkCurrentUser(currentUser);
     }
 
 

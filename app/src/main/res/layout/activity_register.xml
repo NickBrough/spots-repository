@@ -107,17 +107,6 @@
                     android:background="@drawable/white_rounded_button">
                 </androidx.appcompat.widget.AppCompatButton>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="25dp"
-                    android:text="Create account"
-                    android:gravity="center"
-                    android:textSize="16dp"
-                    android:textColor="@color/grey">
-
-                </TextView>
-
                 </LinearLayout>
 
 
@@ -127,24 +116,33 @@
 
     </RelativeLayout>
 
-    <ProgressBar
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:id="@+id/progressBar"
-        android:layout_centerInParent="true">
-
-    </ProgressBar>
-
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please wait..."
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:layout_alignBottom="@+id/progressBar"
-        android:layout_centerHorizontal="true">
+        android:layout_centerInParent="true"
+        android:id="@+id/RelLayoutLoading">
 
-    </TextView>
+        <ProgressBar
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/progressBar"
+            android:layout_centerHorizontal="true">
+
+        </ProgressBar>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please wait..."
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:layout_alignBottom="@+id/progressBar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp">
+
+        </TextView>
+
+    </RelativeLayout>
 
 
 </RelativeLayout>

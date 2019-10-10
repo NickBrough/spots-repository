@@ -26,7 +26,7 @@
                 android:id="@+id/changeProfilePhoto"
                 android:layout_below="@+id/profile_photo"
                 android:layout_centerHorizontal="true"
-                android:textColor="@color/black"
+                android:textColor="@color/blue"
                 android:textSize="16dp">
 
             </TextView>
@@ -46,7 +46,6 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_display"
                     android:layout_centerVertical="true">
-
                 </ImageView>
 
                 <EditText
@@ -55,20 +54,49 @@
                     android:id="@+id/display_name"
                     android:layout_marginStart="40dp"
                     android:background="@null"
+                    android:hint="Display Name"
+                    android:inputType="textNoSuggestions">
+
+                </EditText>
+            </RelativeLayout>
+
+            <!-- username section-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayout1"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/grey_border_bottom"
+                android:id="@+id/relLayout2">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_display"
+                    android:layout_centerVertical="true">
+                </ImageView>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/username"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:hint="Username"
                     android:inputType="textNoSuggestions">
 
                 </EditText>
             </RelativeLayout>
 
 
-            <!-- location section -->
+            <!-- Home section -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relLayout1"
+                android:layout_below="@+id/relLayout2"
                 android:background="@drawable/grey_border_bottom"
-                android:layout_marginTop="15dp"
-                android:id="@+id/relLayout2">
+                android:layout_marginTop="20dp"
+                android:id="@+id/relLayout3">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -81,7 +109,39 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/username"
+                    android:id="@+id/homeCity"
+                    android:hint="Home City"
+
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:inputType="textNoSuggestions">
+
+                </EditText>
+            </RelativeLayout>
+
+            <!--city section-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relLayout3"
+                android:background="@drawable/grey_border_bottom"
+                android:layout_marginTop="20dp"
+                android:id="@+id/relLayout4">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_pin"
+                    android:layout_centerVertical="true">
+
+                </ImageView>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/homeTown"
+                    android:hint="Home Town"
+
                     android:layout_marginStart="40dp"
                     android:background="@null"
                     android:inputType="textNoSuggestions">
@@ -93,29 +153,28 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/relLayout2"
+                android:layout_below="@+id/relLayout4"
                 android:background="@drawable/grey_border_bottom"
-                android:layout_marginTop="15dp"
-                android:id="@+id/relLayout3">
+                android:layout_marginTop="20dp"
+                android:id="@+id/relLayout5">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_description"
                     android:layout_centerVertical="true">
-
                 </ImageView>
 
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/bio"
+                    android:id="@+id/description"
                     android:layout_marginStart="40dp"
                     android:background="@null"
-                    android:inputType="textNoSuggestions"
-                    >
-
+                    android:hint="Description"
+                    android:inputType="textNoSuggestions">
                 </EditText>
+
             </RelativeLayout>
 
 

@@ -1,5 +1,31 @@
 <resources>
     <string name="app_name">Spots</string>
+
+    <!--fragments-->
     <string name="edit_profile_fragment">Edit Profile</string>
     <string name="sign_out_fragment">Sign Out</string>
+    <string name="profile_fragment">Profile</string>
+
+    <!--firebase database fields-->
+    <string name="dbname_user">user</string>
+    <string name="dbname_user_account_settings">user_account_settings</string>
+
+    <!--database field names-->
+    <string name="field_username">username</string>
+    <string name="field_display_name">display_name</string>
+    <string name="field_home_town">home_town</string>
+    <string name="field_home_city">home_city</string>
+    <string name="field_description">description</string>
+
+
+    <!--intent extras-->
+    <string name="selected_image">selected_image</string>
+
+    <!--strings-->
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="string_open_camera">Open Camera</string>
+    <string name="string_next">Next</string>
+
+
 </resources>
