@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +23,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nickb.spots.R;
+import com.nickb.spots.models.Like;
 import com.nickb.spots.models.Spot;
 import com.nickb.spots.models.UserAccountSettings;
 
@@ -34,6 +36,7 @@ public class ViewPostFragment extends Fragment {
     // constants
     private static final String TAG = "ViewPostFragment";
     private static final String mAppend = "file:/";
+    private static boolean LIKED = false;
 
 
     public ViewPostFragment() {
@@ -85,36 +88,38 @@ public class ViewPostFragment extends Fragment {
         setupWidgets();
 
 
+
+
         return view;
     }
 
-    private void getPhotoDetails() {
 
+
+    private void getPhotoDetails(){
+        Log.d(TAG, "getPhotoDetails: retrieving photo details.");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        // query for the user with the same user_id that the photo has
         Query query = reference
                 .child(getString(R.string.dbname_user_account_settings))
                 .orderByChild(getString(R.string.field_user_id))
                 .equalTo(mSpot.getUser_id());
-
-        // loop through all spots and add them to the arraylist
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for ( DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
                     mUserAccountSettings = singleSnapshot.getValue(UserAccountSettings.class);
                 }
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, "onCancelled: query cancelled");
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: query cancelled.");
             }
         });
     }
 
+
     private void init(View view) {
+
         mContext = getActivity();
         mPhoto = view.findViewById(R.id.post_view);
         mTitle = view.findViewById(R.id.title);
@@ -125,15 +130,102 @@ public class ViewPostFragment extends Fragment {
         mProfilePhoto = view.findViewById(R.id.profile_photo);
         bottomNavigationViewEx = view.findViewById(R.id.bottomNavViewBar);
         mBackarrow = view.findViewById(R.id.backArrow);
-
-
     }
 
 
 
     private void setupWidgets() {
-//        UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
-//        mUsername.setText(mUserAccountSettings.getUsername());
+         //UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
+         //mUsername.setText(mUserAccountSettings.getUsername());
+         setLikeToggle();
+    }
+
+    private void setLikeToggle() {
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(LIKED) {
+                    btnLike.setText("Like");
+                    LIKED = false;
+                } else {
+                    btnLike.setText("Unlike");
+                    LIKED = true;
+                }
+
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                Query query = reference
+                        .child(getString(R.string.dbname_spots))
+                        .orderByChild(mSpot.getPhoto_id())
+                        .equalTo(getString(R.string.field_likes));
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
+
+                            String keyID = singleSnapshot.getKey();
+
+                            // case 1 the user already liked the photo
+                            if(LIKED && singleSnapshot.getValue(Like.class).getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                myRef.child(getString(R.string.dbname_spots))
+                                        .child(mSpot.getPhoto_id())
+                                        .child(getString(R.string.field_likes))
+                                        .child(keyID)
+                                        .removeValue();
+
+                                myRef.child(getString(R.string.dbname_user_spots))
+                                        .child(mSpot.getPhoto_id())
+                                        .child(getString(R.string.field_likes))
+                                        .child(keyID)
+                                        .removeValue();
+
+                            } else if (!LIKED) {
+                                // case 2 user has not liked it
+                                // add new like
+                                addNewLike();
+                                break;
+                            }
+                        }
+
+                        if (!dataSnapshot.exists()) {
+                            // add new like
+                            addNewLike();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+
+
+        });
+    }
+
+
+    private void addNewLike() {
+        Log.d(TAG, "addNewLike: adding new like");
+
+        String newLikeID = myRef.push().getKey();
+        Like like = new Like();
+        like.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        myRef.child(getString(R.string.dbname_spots))
+                .child(mSpot.getPhoto_id())
+                .child(getString(R.string.field_likes))
+                .child(newLikeID)
+                .setValue(like);
+
+        myRef.child(getString(R.string.dbname_user_spots))
+                .child(mSpot.getPhoto_id())
+                .child(getString(R.string.field_likes))
+                .child(newLikeID)
+                .setValue(like);
+
+
     }
 
 

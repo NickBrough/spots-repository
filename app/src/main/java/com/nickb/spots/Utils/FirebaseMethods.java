@@ -223,7 +223,6 @@ public class FirebaseMethods {
 
     private void addPhotoToDatabase(String title, String description, String imgUrl) {
 
-        Log.d(TAG, "addPhotoToDatabase: adding photo to database");
 
         // retrieve a unique key for the photo
         String photoKey = myRef.child(mContext.getString(R.string.dbname_spots)).push().getKey();
@@ -235,6 +234,7 @@ public class FirebaseMethods {
         spot.setDate_created(getTimestamp());
         spot.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+        Log.d(TAG, "addPhotoToDatabase: adding photo to database" + spot);
 
         // insert into database
         myRef.child(mContext.getString(R.string.dbname_user_spots)).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(photoKey).setValue(spot);

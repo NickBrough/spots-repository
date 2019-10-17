@@ -3,6 +3,8 @@ package com.nickb.spots.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 public class Spot implements Parcelable {
 
     private String title;
@@ -12,8 +14,10 @@ public class Spot implements Parcelable {
     private String photo_id;
     private String user_id;
     private String tags;
+    private List<Like> likes;
 
-    public Spot(String title, String description, String date_created, String image_path, String photo_id, String user_id, String tags) {
+
+    public Spot(String title, String description, String date_created, String image_path, String photo_id, String user_id, String tags, List<Like> likes) {
         this.title = title;
         this.description = description;
         this.date_created = date_created;
@@ -21,6 +25,18 @@ public class Spot implements Parcelable {
         this.photo_id = photo_id;
         this.user_id = user_id;
         this.tags = tags;
+        this.likes = likes;
+    }
+
+    public Spot() {
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -29,16 +45,6 @@ public class Spot implements Parcelable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Spot() {}
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String caption) {
-        this.title = title;
     }
 
     public String getDate_created() {
@@ -81,6 +87,14 @@ public class Spot implements Parcelable {
         this.tags = tags;
     }
 
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
     @Override
     public String toString() {
         return "Spot{" +
@@ -91,6 +105,7 @@ public class Spot implements Parcelable {
                 ", photo_id='" + photo_id + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", tags='" + tags + '\'' +
+                ", likes=" + likes +
                 '}';
     }
 
