@@ -15,7 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -30,13 +33,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nickb.spots.R;
 
+import java.util.ArrayList;
+
 
 public class MapViewFragment extends Fragment {
 
     private static final String TAG = "MapViewFragment";
     MapView mMapView;
     private GoogleMap googleMap;
-
+    private ArrayList<LatLng> spotLocations;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
 
 
 
@@ -45,6 +51,13 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
+
+        spotLocations = new ArrayList<>();
+        spotLocations.add(new LatLng(-34, 151));
+        spotLocations.add(new LatLng(-123, 154));
+        spotLocations.add(new LatLng(-32, 141));
+        spotLocations.add(new LatLng(-10, 121));
+        spotLocations.add(new LatLng(-40, 181));
 
 
         mMapView = (MapView) view.findViewById(R.id.mapView);
@@ -84,6 +97,8 @@ public class MapViewFragment extends Fragment {
                             .position(sydney)
                             .title("Marker Title"));
 
+                    addMarkers(spotLocations);
+
 
                     // For zooming automatically to the location of the marker
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
@@ -100,6 +115,16 @@ public class MapViewFragment extends Fragment {
         return view;
     }
 
+
+
+    private void addMarkers(ArrayList<LatLng> spotLocations) {
+
+        for (int i = 0; i < spotLocations.size(); i++) {
+            googleMap.addMarker(new MarkerOptions()
+            .position(spotLocations.get(i)));
+
+        }
+    }
 
     @Override
     public void onResume() {
