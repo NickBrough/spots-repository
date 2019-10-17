@@ -75,7 +75,6 @@ public class MapViewFragment extends Fragment {
                     googleMap = mMap;
 
 
-
                     // For showing a move to my location button
                     googleMap.setMyLocationEnabled(true);
 

@@ -132,8 +132,8 @@ public class ViewPostFragment extends Fragment {
 
 
     private void setupWidgets() {
-        UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
-        mUsername.setText(mUserAccountSettings.getUsername());
+//        UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
+//        mUsername.setText(mUserAccountSettings.getUsername());
     }
 
 
