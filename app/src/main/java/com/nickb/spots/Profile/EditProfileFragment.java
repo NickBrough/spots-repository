@@ -1,5 +1,6 @@
 package com.nickb.spots.Profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nickb.spots.R;
+import com.nickb.spots.Share.GalleryFragment;
+import com.nickb.spots.Share.ShareActivity;
 import com.nickb.spots.Utils.FirebaseMethods;
 import com.nickb.spots.Utils.StringManipulation;
 import com.nickb.spots.Utils.UniversalImageLoader;
@@ -70,6 +73,19 @@ public class EditProfileFragment extends Fragment {
 
         setupFirebaseAuth();
 
+        mChangePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: changing profile photo");
+
+                Intent intent = new Intent(getActivity(), ShareActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // add the flag so we the gallery knows where we are coming from
+                getActivity().startActivity(intent);
+                getActivity().finish();
+
+
+            }
+        });
 
 
         mSubmit.setOnClickListener(new View.OnClickListener() {

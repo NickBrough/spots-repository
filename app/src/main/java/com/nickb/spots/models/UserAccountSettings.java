@@ -10,8 +10,9 @@ public class UserAccountSettings {
     private String home_city;
     private String username;
     private String profile_photo;
+    private String user_id;
 
-    public UserAccountSettings(String description, String display_name, long spot_count, long rating, String home_town, String home_city, String username, String profile_photo) {
+    public UserAccountSettings(String description, String display_name, long spot_count, long rating, String home_town, String home_city, String username, String profile_photo, String user_id) {
         this.description = description;
         this.display_name = display_name;
         this.spot_count = spot_count;
@@ -20,9 +21,18 @@ public class UserAccountSettings {
         this.home_city = home_city;
         this.username = username;
         this.profile_photo = profile_photo;
+        this.user_id = user_id;
     }
 
     public UserAccountSettings() {
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public String getProfile_photo() {

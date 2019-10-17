@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -22,14 +23,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nickb.spots.R;
 import com.nickb.spots.Utils.BottomNavigationViewHelper;
 import com.nickb.spots.Utils.FirebaseMethods;
+import com.nickb.spots.Utils.GridImageAdapter;
 import com.nickb.spots.Utils.UniversalImageLoader;
+import com.nickb.spots.models.Spot;
 import com.nickb.spots.models.UserAccountSettings;
 import com.nickb.spots.models.UserSettings;
+
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +47,18 @@ public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
     private static final int ACTIVITY_NUM = 2;
+    private static final int NUM_OF_GRID_COLUMNS = 3;
+    private static final String mAppend = "file:/";
+
+    public interface OnGridImageSelectedListener {
+        void onGridImageSelected(Spot spot, int activityNumber);
+    }
+
+    OnGridImageSelectedListener mOnGridImageSelectedListener;
+
+
+
+
 
     // Fire base
     private FirebaseAuth mAuth;
@@ -92,13 +110,25 @@ public class ProfileFragment extends Fragment {
         setupBottomNavigationView();
         setupToolbar();
         setupFirebaseAuth();
+        setupGridView();
 
         return view;
     }
 
 
 
-//    private void tempGridSetup() {
+    // when the fragment is attached to the activity set the grid image select listener
+    @Override
+    public void onAttach(@NonNull Context context) {
+        try {
+            mOnGridImageSelectedListener = (OnGridImageSelectedListener) getActivity();
+        } catch (ClassCastException e) {
+            Log.d(TAG, "onAttach: ClassCastException: " + e.getMessage());
+        }
+        super.onAttach(context);
+    }
+
+    //    private void tempGridSetup() {
 //        ArrayList<String> imgURLS = new ArrayList<>();
 //        imgURLS.add("https://iso.500px.com/wp-content/uploads/2016/04/stock-photo-150595123.jpg");
 //        imgURLS.add("https://iso.500px.com/wp-content/uploads/2016/04/stock-photo-150595123.jpg");
@@ -109,17 +139,56 @@ public class ProfileFragment extends Fragment {
 //
 //    }
 
-//    private void setupImageGrid(ArrayList<String> imgURLs) {
-//
-//
-//        int gridWidth = getResources().getDisplayMetrics().widthPixels;
-//        int imageWidth = gridWidth/NUM_OF_GRID_COLUMNS;
-//
-//        gridView.setColumnWidth(imageWidth);
-//
-//        GridImageAdapter adapter = new GridImageAdapter(mContext, R.layout.layout_grid_imageview, "", imgURLs);
-//        gridView.setAdapter(adapter);
-//    }
+    private void setupGridView() {
+        Log.d(TAG, "setupGridView: Setting up image grid");
+
+        final ArrayList<Spot> spots = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        Query query = reference.child(getString(R.string.dbname_user_spots)).child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        // loop through all spots and add them to the arraylist
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
+                    spots.add(singleSnapshot.getValue(Spot.class));
+                }
+
+                // setup image grid
+                int gridWidth = getResources().getDisplayMetrics().widthPixels;
+                int imageWidth = gridWidth/NUM_OF_GRID_COLUMNS;
+                gridView.setColumnWidth(imageWidth);
+
+
+                ArrayList<String> imgURLs = new ArrayList<>();
+                for (int i = 0; i < spots.size(); i++) {
+                    imgURLs.add(spots.get(i).getImage_path());
+                }
+
+                GridImageAdapter adapter = new GridImageAdapter(getActivity(), R.layout.layout_grid_imageview, imgURLs, mAppend);
+                gridView.setAdapter(adapter);
+
+
+                gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        mOnGridImageSelectedListener.onGridImageSelected(spots.get(position), ACTIVITY_NUM);
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: query cancelled");
+            }
+        });
+
+
+
+    }
+
 
     private void setProfileWidget(UserSettings userSettings) {
         Log.d(TAG, "setProfileWidget: Setting profile widgets with data recieved from firebase: " + userSettings.toString());
@@ -166,13 +235,14 @@ public class ProfileFragment extends Fragment {
         Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
 
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
-        BottomNavigationViewHelper.enableNavigation(mContext, bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigation(mContext, getActivity(), bottomNavigationViewEx);
 
 
         Menu menu = bottomNavigationViewEx.getMenu();
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
     }
+
     // ----------------- Firebase ------------------
 
 

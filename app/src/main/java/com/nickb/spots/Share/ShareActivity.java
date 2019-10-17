@@ -40,9 +40,15 @@ public class ShareActivity extends AppCompatActivity {
         if (checkPermissionArray(Permissions.PERMISSIONS)) {
             setupViewPager();
         } else {
+            // else verify them
             verifyPermissions(Permissions.PERMISSIONS);
         }
         setupBottomNavigationView ();
+    }
+
+    public int getTask() {
+        // returns zero if intent is from home activity or a number if from edit profile
+        return getIntent().getFlags();
     }
 
     private void setupViewPager() {
@@ -120,7 +126,7 @@ public class ShareActivity extends AppCompatActivity {
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
-        BottomNavigationViewHelper.enableNavigation(mContext, bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigation(mContext,this, bottomNavigationViewEx);
 
 
         Menu menu = bottomNavigationViewEx.getMenu();

@@ -1,5 +1,6 @@
 package com.nickb.spots.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
@@ -20,14 +21,13 @@ public class BottomNavigationViewHelper {
         Log.d(TAG, "setupBottomNavigationView: Setting up BottomNavigationView");
 
         bottomNavigationViewEx.setTextVisibility(false);
-
         bottomNavigationViewEx.enableAnimation(false);
         bottomNavigationViewEx.enableShiftingMode(false);
         bottomNavigationViewEx.enableItemShiftingMode(false);
 
     }
 
-    public static void enableNavigation(final Context context, BottomNavigationViewEx view) {
+    public static void enableNavigation(final Context context, final Activity callingActivity, BottomNavigationViewEx view) {
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -35,14 +35,19 @@ public class BottomNavigationViewHelper {
                     case R.id.ic_house:
                         Intent intent1 = new Intent(context, HomeActivity.class); //ACTIVITY_NUM = 0
                         context.startActivity(intent1);
+                        callingActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         break;
                     case R.id.ic_camera:
                         Intent intent2 = new Intent(context, ShareActivity.class); //ACTIVITY_NUM = 1
                         context.startActivity(intent2);
+                        callingActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
                         break;
                     case R.id.ic_user:
                         Intent intent3 = new Intent(context, ProfileActivity.class); //ACTIVITY_NUM = 2
                         context.startActivity(intent3);
+                        callingActivity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
                         break;
                 }
 

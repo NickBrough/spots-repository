@@ -18,31 +18,21 @@
                     android:layout_height="25dp"
                     android:layout_marginEnd="20dp"
                     android:layout_centerVertical="true"
-                    android:id="@+id/backArrow"
-                    android:src="@drawable/ic_backarrow">
+                    android:src="@drawable/ic_backarrow"
+                    android:id="@+id/backArrow">
                 </ImageView>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="Upload"
-                    android:textSize="20sp"
                     android:layout_toRightOf="@+id/backArrow"
+                    android:text="Spot"
+                    android:textSize="20sp"
                     android:textColor="@color/white"
                     android:layout_marginStart="5dp"
-                    android:id="@+id/profileTitle">
+                    android:id="@+id/accountSettingsTitle">
                 </TextView>
-
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginEnd="20dp"
-                    android:layout_centerVertical="true"
-                    android:id="@+id/upload"
-                    android:src="@drawable/ic_upload">
-                </ImageView>
-
             </RelativeLayout>
 
 

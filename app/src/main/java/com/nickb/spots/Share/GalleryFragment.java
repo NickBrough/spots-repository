@@ -2,7 +2,6 @@ package com.nickb.spots.Share;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -13,18 +12,16 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nickb.spots.Profile.AccountSettingsActivity;
 import com.nickb.spots.R;
-import com.nickb.spots.Utils.FileSearch;
+import com.nickb.spots.Utils.FileHelper;
 import com.nickb.spots.Utils.GridImageAdapter;
-import com.nickb.spots.Utils.UniversalImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -57,7 +54,7 @@ public class GalleryFragment extends Fragment {
 
         mProgressBar.setVisibility(View.GONE);
         mConfirm.setVisibility(View.GONE);
-        Toast.makeText(getActivity(), "Tap image to confirm", Toast.LENGTH_LONG);
+        Toast.makeText(getActivity(), "Tap image to confirm", Toast.LENGTH_LONG).show();
 
         setupConfirmButton();
         setupGridView();
@@ -90,21 +87,35 @@ public class GalleryFragment extends Fragment {
         mConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            if(isRootTask()) {
+                // is root task checks if we got to this activity by anything other than edit profile, edit profile has a flag set with it
                 Log.d(TAG, "onClick: confirming image \n navigating to upload");
                 Intent intent = new Intent(getActivity(), UploadActivity.class);
                 intent.putExtra(getString(R.string.selected_image), mSelectedImage);
                 startActivity(intent);
+            } else {
+                // here we know we came from edit profile so along with putting the imgurl as an extra we also want to attach the fragment we return to
+                Log.d(TAG, "onClick: confirming image navigating to accountSettingsActivity");
+                Intent intent = new Intent(getActivity(), AccountSettingsActivity.class);
+                intent.putExtra(getString(R.string.selected_image), mSelectedImage);
+                intent.putExtra(getString(R.string.return_to_fragment), getString(R.string.edit_profile_fragment)); // identifies the fragment that we need to return to
+                Log.d(TAG, "onClick: putting intent extras: img URL" + mSelectedImage + "return fragment: "+ getString(R.string.edit_profile_fragment));
+
+                startActivity(intent);
+                getActivity().finish();
+            }
             }
         });
     }
 
     private void setupGridView() {
         String directory = Environment.getExternalStorageDirectory().getPath() + "/DCIM/camera";
-//        String directory = Environment.getExternalStorageDirectory().getParent() + "/pictures";
+
+        // String directory = Environment.getExternalStorageDirectory().getParent() + "/pictures";
         Log.d(TAG, "setupGridView: file path: " + directory);
 
 
-        final ArrayList<String> imgURLs = FileSearch.getFilePaths(directory);
+        final ArrayList<String> imgURLs = FileHelper.getFilePaths(directory);
 
         // set the grid column width so each image is the same size
         int gridWidth = getResources().getDisplayMetrics().widthPixels;
@@ -117,9 +128,7 @@ public class GalleryFragment extends Fragment {
 
         // set image view to first image
         setImage(imgURLs.get(0), mGalleryImageView, mAppend);
-
-
-
+        mSelectedImage = imgURLs.get(0);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -127,16 +136,27 @@ public class GalleryFragment extends Fragment {
                 Log.d(TAG, "onItemClick: selected item: " + imgURLs.get(position));
 
                 setImage(imgURLs.get(position), mGalleryImageView, mAppend);
+                mSelectedImage = imgURLs.get(position);
+
             }
         });
 
     }
 
+    private boolean isRootTask() {
+        if(((ShareActivity)getActivity()).getTask() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void setImage(String imgURL, ImageView image, String append) {
         Log.d(TAG, "setImage: setting image");
 
-        mSelectedImage = append + imgURL;
         ImageLoader imageLoader = ImageLoader.getInstance();
+
+
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
             @Override
             public void onLoadingStarted(String imageUri, View view) {

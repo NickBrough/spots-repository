@@ -1,10 +1,15 @@
 package com.nickb.spots.Utils;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,10 +17,23 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.nickb.spots.Home.HomeActivity;
+import com.nickb.spots.Profile.AccountSettingsActivity;
 import com.nickb.spots.R;
+import com.nickb.spots.Share.UploadActivity;
+import com.nickb.spots.models.Spot;
 import com.nickb.spots.models.User;
 import com.nickb.spots.models.UserAccountSettings;
 import com.nickb.spots.models.UserSettings;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
 
@@ -26,7 +44,9 @@ public class FirebaseMethods {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference myRef;
+    private StorageReference mStorageReference;
 
+    private double mPhotoUploadProgress = 0;
     private String userID;
 
     private Context mContext;
@@ -37,11 +57,205 @@ public class FirebaseMethods {
 
        mFirebaseDatabase = FirebaseDatabase.getInstance();
        myRef = mFirebaseDatabase.getReference();
+       mStorageReference = FirebaseStorage.getInstance().getReference();
+
 
         if(mAuth.getCurrentUser() != null) {
             userID = mAuth.getUid();
         }
 
+    }
+
+    public void uploadNewPhoto(String photoType, final String title, final String description, int count, final String imgUrl, Bitmap bitmap) {
+        Log.d(TAG, "uploadNewPhoto: attempting to upload new photo");
+
+        Log.d(TAG, "uploadNewPhoto: " + photoType + title + description + count + imgUrl);
+
+        FileHelper fileHelper = new FileHelper();
+
+
+        // case 1 new photo
+        if(photoType.equals(mContext.getString(R.string.new_photo))) {
+            Log.d(TAG, "uploadNewPhoto: uploading new photo");
+
+            String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final StorageReference storageReference = mStorageReference.child(fileHelper.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/photo_" + (count + 1));
+
+            if (bitmap == null) {
+                // convert image url to bitmap
+                bitmap = ImageManager.getBitmap(imgUrl);
+            }
+
+            // convert bitmap to byte array
+            byte[] bytes = ImageManager.getBytesFromBitmap(bitmap, 100);
+
+
+            final UploadTask uploadTask = storageReference.putBytes(bytes);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //Uri url = taskSnapshot.getDownloadUrl();
+                    Task<Uri> uri = taskSnapshot.getStorage().getDownloadUrl();
+                    while(!uri.isComplete());
+                    Uri url = uri.getResult();
+
+                    Toast.makeText(mContext, "Upload Success", Toast.LENGTH_LONG).show();
+
+                    Log.d(TAG, "onSuccess: upload success, URL: " + url.toString());
+
+
+                    // add url to photos node and user_photos node in database
+
+                    addPhotoToDatabase(title, description, imgUrl);
+                    // navigate to list view so users can see
+                    //navigate to listview
+                    Intent intent = new Intent( mContext, HomeActivity.class);
+                    mContext.startActivity(intent);
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(mContext, "Photo upload failed", Toast.LENGTH_SHORT).show();
+
+                    Log.d(TAG, "onProgress: Upload failed");
+
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+
+                    if (progress - 15 > mPhotoUploadProgress) {
+                        Toast.makeText(mContext, "Photo upload progress: " + String.format("%.05f",progress), Toast.LENGTH_SHORT).show();
+                        mPhotoUploadProgress = progress;
+                    }
+
+                    Log.d(TAG, "onProgress: Upload progress: " + progress);
+                }
+            });
+        }
+        // case 2 new profile photo
+        else if (photoType.equals(mContext.getString(R.string.profile_photo))) {
+            Log.d(TAG, "uploadNewPhoto: uploading new profile photo");
+
+
+
+
+
+
+            String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final StorageReference storageReference = mStorageReference.child(fileHelper.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/profile_photo");
+
+            if (bitmap == null) {
+                // convert image url to bitmap
+                bitmap = ImageManager.getBitmap(imgUrl);
+
+                // else the photo was taken by camera and is already a bitmap
+            }
+
+            // convert bitmap to byte array
+            byte[] bytes = ImageManager.getBytesFromBitmap(bitmap, 100);
+
+
+            final UploadTask uploadTask = storageReference.putBytes(bytes);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //Uri url = taskSnapshot.getDownloadUrl();
+                    Task<Uri> uri = taskSnapshot.getStorage().getDownloadUrl();
+                    while(!uri.isComplete());
+                    Uri url = uri.getResult();
+
+                    Toast.makeText(mContext, "Upload Success, download URL ", Toast.LENGTH_LONG).show();
+
+                    // insert into the user_account_settings
+                    setProfilePhoto(url.toString());
+
+                    // set the view pager to take directly to back to edit profile, the pager adapter has a method to get fragment number by the name
+                    ((AccountSettingsActivity)mContext).setViewPager(
+                            ((AccountSettingsActivity)mContext).pagerAdapter.getFragmentNumber(mContext.getString(R.string.edit_profile_fragment))
+                    );
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(mContext, "Photo upload failed", Toast.LENGTH_SHORT).show();
+
+                    Log.d(TAG, "onProgress: Upload failed");
+
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+
+                    if (progress - 15 > mPhotoUploadProgress) {
+                        Toast.makeText(mContext, "Photo upload progress: " + String.format("%.05f",progress), Toast.LENGTH_SHORT).show();
+                        mPhotoUploadProgress = progress;
+                    }
+
+                    Log.d(TAG, "onProgress: Upload progress: " + progress);
+                }
+            });
+        }
+    }
+
+    private void setProfilePhoto(String url) {
+        Log.d(TAG, "setProfilePhoto: setting profile photo");
+
+        myRef.child(mContext.getString(R.string.dbname_user_account_settings))
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(mContext.getString(R.string.profile_photo)).setValue(url);
+    }
+
+    // returns a date object of right now
+    private String getTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("DD-MM-YYYY'T'HH:MM:SS'Z'", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("Australia/Melbourne"));
+
+        return sdf.format(new Date());
+    }
+
+    private void addPhotoToDatabase(String title, String description, String imgUrl) {
+
+        Log.d(TAG, "addPhotoToDatabase: adding photo to database");
+
+        // retrieve a unique key for the photo
+        String photoKey = myRef.child(mContext.getString(R.string.dbname_spots)).push().getKey();
+        Spot spot = new Spot();
+        spot.setTitle(title);
+        spot.setDescription(description);
+        spot.setImage_path(imgUrl);
+        spot.setPhoto_id(photoKey);
+        spot.setDate_created(getTimestamp());
+        spot.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+
+        // insert into database
+        myRef.child(mContext.getString(R.string.dbname_user_spots)).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(photoKey).setValue(spot);
+        myRef.child(mContext.getString(R.string.dbname_spots)).child(photoKey).setValue(spot);
+
+
+    }
+
+
+
+
+    public int getImageCount(DataSnapshot dataSnapshot) {
+        int count = 0;
+        for (DataSnapshot ds: dataSnapshot
+                .child(mContext.getString(R.string.dbname_spots))
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .getChildren()) {
+            count++;
+        }
+
+        return count;
     }
 
     public void updateUsername(String username) {
@@ -164,7 +378,8 @@ public class FirebaseMethods {
                 "",
                 "",
                 StringManipulation.condenseUsername(username),
-                profile_photo);
+                profile_photo,
+                userID);
 
         // find that node in the database and set it to the user
         myRef.child(mContext.getString(R.string.dbname_user))

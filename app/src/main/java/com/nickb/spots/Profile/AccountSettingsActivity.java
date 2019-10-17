@@ -1,6 +1,8 @@
 package com.nickb.spots.Profile;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
@@ -18,6 +20,7 @@ import android.widget.RelativeLayout;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nickb.spots.R;
 import com.nickb.spots.Utils.BottomNavigationViewHelper;
+import com.nickb.spots.Utils.FirebaseMethods;
 import com.nickb.spots.Utils.SectionsStatePagerAdapter;
 
 import java.util.ArrayList;
@@ -29,7 +32,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
     private Context mContext;
 
-    private SectionsStatePagerAdapter pagerAdapter;
+    public SectionsStatePagerAdapter pagerAdapter;
     private ViewPager mViewPager;
     private RelativeLayout mRelativeLayout;
 
@@ -46,6 +49,8 @@ public class AccountSettingsActivity extends AppCompatActivity {
         setupBottomNavigationView();
         setupSettingsList();
         setupFragments();
+        getIncomingIntent();
+
 
         // setup the backarrow for navigating back to "profileActivity"
         ImageView backArrow = (ImageView) findViewById(R.id.backArrow);
@@ -54,16 +59,42 @@ public class AccountSettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick: navigating back to 'profileActivity'");
 
-                // calls the ondestroy() method for the activity
+                // calls the ondDestroy() method for the activity
                 finish();
-
             }
         });
 
+
+    }
+
+    private void getIncomingIntent() {
+        Intent intent = getIntent();
+
+        Log.d(TAG, "getIncomingIntent: get incoming intent");
+        // if there is an img url attatched as an extra then it was chosen from the gallery/photo fragment
+
+        if(intent.hasExtra(getString(R.string.selected_image)) ||intent.hasExtra(getString(R.string.selected_bitmap))) {
+
+            if (intent.getStringExtra(getString(R.string.return_to_fragment)).equals(getString(R.string.edit_profile_fragment))) {
+                // we are changing our profile photo, set new profile picture
+
+                if (intent.hasExtra(getString(R.string.selected_image))) {
+                    Log.d(TAG, "getIncomingIntent: Incoming img url: " + intent.getStringExtra(getString(R.string.selected_image)));
+                    FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
+                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, null, 0, intent.getStringExtra(getString(R.string.selected_image)), null);
+                } else if (intent.hasExtra(getString(R.string.selected_bitmap))) {
+                    // if the photo was taken by a camera it will return a bitmap and not a url
+
+                    FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
+                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, null, 0, null, (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap)));
+
+                }
+            }
+        }
     }
 
     // responsible for navigating to the fragment
-    private void setViewPager(int fragmentNumber) {
+    public void setViewPager(int fragmentNumber) {
         mRelativeLayout.setVisibility(View.GONE);
         Log.d(TAG, "setViewPager: Navigating to fragment #:" + fragmentNumber);
         // set up the view pager
@@ -114,7 +145,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
-        BottomNavigationViewHelper.enableNavigation(mContext, bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigation(mContext,this, bottomNavigationViewEx);
 
         Menu menu = bottomNavigationViewEx.getMenu();
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
