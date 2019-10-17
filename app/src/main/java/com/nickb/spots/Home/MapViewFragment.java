@@ -37,6 +37,9 @@ public class MapViewFragment extends Fragment {
     MapView mMapView;
     private GoogleMap googleMap;
 
+
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

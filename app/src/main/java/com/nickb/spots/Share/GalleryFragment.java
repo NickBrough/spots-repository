@@ -127,8 +127,14 @@ public class GalleryFragment extends Fragment {
 
 
         // set image view to first image
-        setImage(imgURLs.get(0), mGalleryImageView, mAppend);
-        mSelectedImage = imgURLs.get(0);
+        try {
+            setImage(imgURLs.get(0), mGalleryImageView, mAppend);
+            mSelectedImage = imgURLs.get(0);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Log.d(TAG, "setupGridView: ArrayIndexOutOfBoundsException: " + e.getMessage());
+
+        }
+
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

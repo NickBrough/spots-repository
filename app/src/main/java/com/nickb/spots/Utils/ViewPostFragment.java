@@ -81,6 +81,9 @@ public class ViewPostFragment extends Fragment {
 
         setupBottomNavigationView();
         setupFirebaseAuth();
+        getPhotoDetails();
+        setupWidgets();
+
 
         return view;
     }
@@ -122,6 +125,15 @@ public class ViewPostFragment extends Fragment {
         mProfilePhoto = view.findViewById(R.id.profile_photo);
         bottomNavigationViewEx = view.findViewById(R.id.bottomNavViewBar);
         mBackarrow = view.findViewById(R.id.backArrow);
+
+
+    }
+
+
+
+    private void setupWidgets() {
+        UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
+        mUsername.setText(mUserAccountSettings.getUsername());
     }
 
 
