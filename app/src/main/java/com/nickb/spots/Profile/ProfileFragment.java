@@ -31,11 +31,15 @@ import com.nickb.spots.Utils.BottomNavigationViewHelper;
 import com.nickb.spots.Utils.FirebaseMethods;
 import com.nickb.spots.Utils.GridImageAdapter;
 import com.nickb.spots.Utils.UniversalImageLoader;
+import com.nickb.spots.models.Like;
 import com.nickb.spots.models.Spot;
 import com.nickb.spots.models.UserAccountSettings;
 import com.nickb.spots.models.UserSettings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -79,7 +83,7 @@ public class ProfileFragment extends Fragment {
 
     private Context mContext;
 
-    // Navigating to EditProfile Fragment (Part 33)
+    // Navigating to EditProfile Fragment 33
 
     @Nullable
     @Override
@@ -152,7 +156,37 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
-                    spots.add(singleSnapshot.getValue(Spot.class));
+
+                    Spot spot = new Spot();
+                    // cast the snapshot to a hashmap to store the likes
+                    // firebase doesn't like lists within nodes, it reads them as a hashmap
+
+                    Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
+
+
+                    spot.setUser_id(objectMap.get(getString(R.string.field_user_id)).toString());
+                    spot.setDate_created(objectMap.get(getString(R.string.field_date_created)).toString());
+                    spot.setPhoto_id(objectMap.get(getString(R.string.field_photo_id)).toString());
+                    spot.setImage_path(objectMap.get(getString(R.string.field_image_path)).toString());
+                    spot.setDescription(objectMap.get(getString(R.string.field_description)).toString());
+
+                    Log.d(TAG, "onDataChange: " + objectMap.get(getString(R.string.field_title)));
+                    spot.setTitle(objectMap.get(getString(R.string.field_title)).toString());
+                    spot.setDescription(objectMap.get(getString(R.string.field_description)).toString());
+//                  spot.setTags(objectMap.get(getString(R.string.field_tags)).toString());
+
+                    List<Like> likesList = new ArrayList<Like>();
+                    for (DataSnapshot dSnapshot: dataSnapshot.child(getString(R.string.field_likes)).getChildren()) {
+                        Like like = new Like();
+                        like.setUser_id(dSnapshot.getValue(Like.class).getUser_id());
+                        likesList.add(like);
+                    }
+                    spot.setLikes(likesList);
+
+                    spots.add(spot);
+
+                    // old way to add spots (without the likes list)
+                    // spots.add(singleSnapshot.getValue(Spot.class));
                 }
 
                 // setup image grid

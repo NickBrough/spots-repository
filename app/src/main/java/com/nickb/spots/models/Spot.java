@@ -31,6 +31,28 @@ public class Spot implements Parcelable {
     public Spot() {
     }
 
+    protected Spot(Parcel in) {
+        title = in.readString();
+        description = in.readString();
+        date_created = in.readString();
+        image_path = in.readString();
+        photo_id = in.readString();
+        user_id = in.readString();
+        tags = in.readString();
+    }
+
+    public static final Creator<Spot> CREATOR = new Creator<Spot>() {
+        @Override
+        public Spot createFromParcel(Parcel in) {
+            return new Spot(in);
+        }
+
+        @Override
+        public Spot[] newArray(int size) {
+            return new Spot[size];
+        }
+    };
+
     public String getTitle() {
         return title;
     }
@@ -116,6 +138,12 @@ public class Spot implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(date_created);
+        dest.writeString(image_path);
+        dest.writeString(photo_id);
+        dest.writeString(user_id);
+        dest.writeString(tags);
     }
 }

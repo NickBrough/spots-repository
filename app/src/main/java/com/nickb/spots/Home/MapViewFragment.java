@@ -118,11 +118,9 @@ public class MapViewFragment extends Fragment {
 
 
     private void addMarkers(ArrayList<LatLng> spotLocations) {
-
         for (int i = 0; i < spotLocations.size(); i++) {
             googleMap.addMarker(new MarkerOptions()
             .position(spotLocations.get(i)));
-
         }
     }
 

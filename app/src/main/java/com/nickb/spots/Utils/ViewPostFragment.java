@@ -77,21 +77,20 @@ public class ViewPostFragment extends Fragment {
             mSpot = getSpotFromBundle();
             UniversalImageLoader.setImage(mSpot.getImage_path(), mPhoto, null, mAppend);
             mActivityNum = getActivityNumberFromBundle();
+
+            setupBottomNavigationView();
+            setupFirebaseAuth();
+            getPhotoDetails();
+//            setupWidgets();
+
         } catch (NullPointerException e) {
             Log.d(TAG, "onCreateView: NullPointerException: " + e.getMessage());
         }
 
 
-        setupBottomNavigationView();
-        setupFirebaseAuth();
-        getPhotoDetails();
-        setupWidgets();
-
-
-
-
         return view;
     }
+
 
 
 
@@ -107,7 +106,9 @@ public class ViewPostFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for ( DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
                     mUserAccountSettings = singleSnapshot.getValue(UserAccountSettings.class);
+                    Log.d(TAG, "onDataChange: user_account_settings: " + mUserAccountSettings);
                 }
+                setupWidgets();
             }
 
             @Override
@@ -130,43 +131,50 @@ public class ViewPostFragment extends Fragment {
         mProfilePhoto = view.findViewById(R.id.profile_photo);
         bottomNavigationViewEx = view.findViewById(R.id.bottomNavViewBar);
         mBackarrow = view.findViewById(R.id.backArrow);
+
     }
 
 
 
     private void setupWidgets() {
-         //UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
-         //mUsername.setText(mUserAccountSettings.getUsername());
+         UniversalImageLoader.setImage(mUserAccountSettings.getProfile_photo(), mProfilePhoto,null, "");
+         mUsername.setText(mUserAccountSettings.getUsername());
          setLikeToggle();
+         mDescription.setText(mSpot.getDescription());
+         mTitle.setText(mSpot.getTitle());
+         mLocation.setText("TODO");
+         mUsername.setText(mUserAccountSettings.getUsername());
+
+         mBackarrow.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 Log.d(TAG, "onClick: navigating back");
+                 getActivity().getSupportFragmentManager().popBackStack();
+             }
+         });
     }
 
     private void setLikeToggle() {
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(LIKED) {
-                    btnLike.setText("Like");
-                    LIKED = false;
-                } else {
-                    btnLike.setText("Unlike");
-                    LIKED = true;
-                }
-
-
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                 Query query = reference
                         .child(getString(R.string.dbname_spots))
-                        .orderByChild(mSpot.getPhoto_id())
-                        .equalTo(getString(R.string.field_likes));
+                        .child(mSpot.getPhoto_id())
+                        .child(getString(R.string.field_likes));
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
+                        Log.d(TAG, "onDataChange: Retrieved datasnapshot: " + dataSnapshot.toString());
 
+                        for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
                             String keyID = singleSnapshot.getKey();
 
                             // case 1 the user already liked the photo
                             if(LIKED && singleSnapshot.getValue(Like.class).getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                Log.d(TAG, "onDataChange: likes exist, unliking");
+
                                 myRef.child(getString(R.string.dbname_spots))
                                         .child(mSpot.getPhoto_id())
                                         .child(getString(R.string.field_likes))
@@ -174,22 +182,32 @@ public class ViewPostFragment extends Fragment {
                                         .removeValue();
 
                                 myRef.child(getString(R.string.dbname_user_spots))
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                         .child(mSpot.getPhoto_id())
                                         .child(getString(R.string.field_likes))
                                         .child(keyID)
                                         .removeValue();
 
+                                btnLike.setText("Like");
+                                LIKED = false;
                             } else if (!LIKED) {
                                 // case 2 user has not liked it
                                 // add new like
+                                Log.d(TAG, "onDataChange: likes exist, adding a like");
+
                                 addNewLike();
+                                btnLike.setText("Unlike");
+                                LIKED = true;
                                 break;
                             }
                         }
 
                         if (!dataSnapshot.exists()) {
+                            Log.d(TAG, "onDataChange: no likes exists, adding like");
                             // add new like
                             addNewLike();
+                            btnLike.setText("Unlike");
+                            LIKED = true;
                         }
                     }
 
@@ -220,6 +238,7 @@ public class ViewPostFragment extends Fragment {
                 .setValue(like);
 
         myRef.child(getString(R.string.dbname_user_spots))
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child(mSpot.getPhoto_id())
                 .child(getString(R.string.field_likes))
                 .child(newLikeID)

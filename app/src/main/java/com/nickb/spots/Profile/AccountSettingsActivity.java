@@ -81,12 +81,12 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 if (intent.hasExtra(getString(R.string.selected_image))) {
                     Log.d(TAG, "getIncomingIntent: Incoming img url: " + intent.getStringExtra(getString(R.string.selected_image)));
                     FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
-                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, null, 0, intent.getStringExtra(getString(R.string.selected_image)), null);
+                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), "", "", 0, intent.getStringExtra(getString(R.string.selected_image)), null);
                 } else if (intent.hasExtra(getString(R.string.selected_bitmap))) {
                     // if the photo was taken by a camera it will return a bitmap and not a url
 
                     FirebaseMethods firebaseMethods = new FirebaseMethods(AccountSettingsActivity.this);
-                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), null, null, 0, null, (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap)));
+                    firebaseMethods.uploadNewPhoto(getString(R.string.profile_photo), "", "", 0, null, (Bitmap) intent.getParcelableExtra(getString(R.string.selected_bitmap)));
 
                 }
             }
