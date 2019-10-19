@@ -83,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_list);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_search);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_search_white);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_map);
 
 

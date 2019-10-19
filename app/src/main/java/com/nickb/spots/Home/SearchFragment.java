@@ -51,12 +51,11 @@ public class SearchFragment extends Fragment {
         mSearchParam = view.findViewById(R.id.searchParam);
         mListView = view.findViewById(R.id.listView);
 
-
         closeKeyboard();
         initTextListener();
+
         return view;
     }
-
 
     private void searchForMatch(String keyword) {
         Log.d(TAG, "searchForMatch: Searching for a match with keyword: " + keyword);
