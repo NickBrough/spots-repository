@@ -3,7 +3,7 @@ package com.nickb.spots.Home;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
+
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,20 +31,28 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.nickb.spots.R;
-
+import com.nickb.spots.models.Location;
 import java.util.ArrayList;
+
 
 
 public class MapViewFragment extends Fragment {
 
     private static final String TAG = "MapViewFragment";
+
     MapView mMapView;
     private GoogleMap googleMap;
-    private ArrayList<LatLng> spotLocations;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private ArrayList<Location> spotLocations;
 
-
+    // Fire base
+    DatabaseReference mReference;
 
     @Nullable
     @Override
@@ -53,14 +61,11 @@ public class MapViewFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
 
         spotLocations = new ArrayList<>();
-        spotLocations.add(new LatLng(-34, 151));
-        spotLocations.add(new LatLng(-123, 154));
-        spotLocations.add(new LatLng(-32, 141));
-        spotLocations.add(new LatLng(-10, 121));
-        spotLocations.add(new LatLng(-40, 181));
+        mReference = FirebaseDatabase.getInstance().getReference();
 
 
-        mMapView = (MapView) view.findViewById(R.id.mapView);
+
+        mMapView = view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
@@ -84,43 +89,64 @@ public class MapViewFragment extends Fragment {
                 public void onMapReady(GoogleMap mMap) {
                     Log.d(TAG, "onMapReady: initialising map");
 
-
                     googleMap = mMap;
-
 
                     // For showing a move to my location button
                     googleMap.setMyLocationEnabled(true);
 
-                    // For dropping a marker at a point on the Map
-                    LatLng sydney = new LatLng(-34, 151);
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(sydney)
-                            .title("Marker Title"));
-
-                    addMarkers(spotLocations);
-
+                    getMarkers();
 
                     // For zooming automatically to the location of the marker
-                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    // CameraPosition cameraPosition = new CameraPosition.Builder().target().zoom(12).build();
+                    // googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                 }
             });
         } else {
             Log.d(TAG, "onCreateView: permissions not granted");
         }
 
-
-
-
         return view;
     }
 
 
+    private void getMarkers() {
+        Query query = mReference
+                .child(getString(R.string.dbname_spots))
+                .orderByChild(getString(R.string.field_location));
 
-    private void addMarkers(ArrayList<LatLng> spotLocations) {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+
+                    Log.d(TAG, "onDataChange: found spot: " + singleSnapshot);
+
+                    Log.d(TAG, "onDataChange: location: " + singleSnapshot.child(getString(R.string.field_location)));
+
+                    double latitude = (double) singleSnapshot.child(getString(R.string.field_location)).child(getString(R.string.field_latitude)).getValue();
+                    double longitude = (double) singleSnapshot.child(getString(R.string.field_location)).child(getString(R.string.field_longitude)).getValue();
+
+                    Location location = new Location(latitude, longitude);
+                    spotLocations.add(location);
+                }
+                addMarkers(spotLocations);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    private void addMarkers(ArrayList<Location> spotLocations) {
         for (int i = 0; i < spotLocations.size(); i++) {
+            LatLng latLng = new LatLng(spotLocations.get(i).getLatitude(), spotLocations.get(i).getLongitude());
             googleMap.addMarker(new MarkerOptions()
-            .position(spotLocations.get(i)));
+            .position(latLng));
         }
     }
 
@@ -150,120 +176,5 @@ public class MapViewFragment extends Fragment {
 
 
 }
-
-
-
-
-
-
-
-
-
-//
-//
-//    private void getLocationPermission() {
-//        /*
-//         * Request location permission, so that we can get the location of the
-//         * device. The result of the permission request is handled by a callback,
-//         * onRequestPermissionsResult.
-//         */
-//        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-//                android.Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED) {
-//            mLocationPermissionGranted = true;
-//            getChatrooms();
-//            getUserDetails();
-//        } else {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-//                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-//        }
-//    }
-//
-//
-//    private void getUserDetails(){
-//        if(mUserLocation == null){
-//            mUserLocation = new UserLocation();
-//            DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
-//                    .document(FirebaseAuth.getInstance().getUid());
-//
-//            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                    if(task.isSuccessful()){
-//                        Log.d(TAG, "onComplete: successfully set the user client.");
-//                        User user = task.getResult().toObject(User.class);
-//                        mUserLocation.setUser(user);
-//                        getLastKnownLocation();
-//                    }
-//                }
-//            });
-//        }
-//        else {
-//            getLastKnownLocation();
-//        }
-//    }
-//
-//    private void getLastKnownLocation() {
-//        Log.d(TAG, "getLastKnownLocation: called.");
-//
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<android.location.Location>() {
-//            @Override
-//            public void onComplete(@NonNull Task<android.location.Location> task) {
-//                if (task.isSuccessful()) {
-//                    Location location = task.getResult();
-//                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-//                    mUserLocation.setGeo_point(geoPoint);
-//                    mUserLocation.setTimestamp(null);
-//                    saveUserLocation();
-//                }
-//            }
-//        });
-//
-//    }
-//
-//    private void saveUserLocation(){
-//
-//        if(mUserLocation != null){
-//            DocumentReference locationRef = mDb
-//                    .collection(getString(R.string.collection_user_locations))
-//                    .document(FirebaseAuth.getInstance().getUid());
-//
-//            locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                @Override
-//                public void onComplete(@NonNull Task<Void> task) {
-//                    if(task.isSuccessful()){
-//                        Log.d(TAG, "saveUserLocation: \ninserted user location into database." +
-//                                "\n latitude: " + mUserLocation.getGeo_point().getLatitude() +
-//                                "\n longitude: " + mUserLocation.getGeo_point().getLongitude());
-//                    }
-//                }
-//            });
-//        }
-//    }
-//
-//
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        Log.d(TAG, "onActivityResult: called.");
-//        switch (requestCode) {
-//            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-//                if(mLocationPermissionGranted){
-//                    getChatrooms();
-//                    getUserDetails();
-//                }
-//                else{
-//                    getLocationPermission();
-//                }
-//            }
-//        }
-//
-//    }
-
 
 

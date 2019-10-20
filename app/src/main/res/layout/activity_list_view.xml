@@ -7,9 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".Home.HomeActivity">
 
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container">
+
+
+    </FrameLayout>
+
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/relLayoutParent">
 
 
         <!--top toolbar-->
@@ -31,7 +42,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/relLayout2"
-            android:layout_below="@+id/relLayout1">
+            android:layout_below="@+id/relLayout1"
+            android:layout_marginBottom="50dp">
 
             <!--the container that swaps out the fragments-->
 

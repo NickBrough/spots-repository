@@ -25,6 +25,7 @@ import com.nickb.spots.Home.HomeActivity;
 import com.nickb.spots.Profile.AccountSettingsActivity;
 import com.nickb.spots.R;
 import com.nickb.spots.Share.UploadActivity;
+import com.nickb.spots.models.Location;
 import com.nickb.spots.models.Spot;
 import com.nickb.spots.models.User;
 import com.nickb.spots.models.UserAccountSettings;
@@ -66,10 +67,10 @@ public class FirebaseMethods {
 
     }
 
-    public void uploadNewPhoto(String photoType, final String title, final String description, int count, final String imgUrl, Bitmap bitmap) {
+    public void uploadNewPhoto(String photoType, final String title, final String description, int count, final String imgUrl, Bitmap bitmap, final Location location) {
         Log.d(TAG, "uploadNewPhoto: attempting to upload new photo");
 
-        Log.d(TAG, "uploadNewPhoto: " + photoType + title + description + count + imgUrl);
+        Log.d(TAG, "uploadNewPhoto: " + photoType + title + description + count + imgUrl + location);
 
         FileHelper fileHelper = new FileHelper();
 
@@ -107,7 +108,7 @@ public class FirebaseMethods {
 
                     // add url to photos node and user_photos node in database
 
-                    addPhotoToDatabase(title, description, imgUrl);
+                    addPhotoToDatabase(title, description, imgUrl, location);
                     // navigate to list view so users can see
                     //navigate to listview
                     Intent intent = new Intent( mContext, HomeActivity.class);
@@ -140,11 +141,6 @@ public class FirebaseMethods {
         // case 2 new profile photo
         else if (photoType.equals(mContext.getString(R.string.profile_photo))) {
             Log.d(TAG, "uploadNewPhoto: uploading new profile photo");
-
-
-
-
-
 
             String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
             final StorageReference storageReference = mStorageReference.child(fileHelper.FIREBASE_IMAGE_STORAGE + "/" + user_id + "/profile_photo");
@@ -221,7 +217,7 @@ public class FirebaseMethods {
         return sdf.format(new Date());
     }
 
-    private void addPhotoToDatabase(String title, String description, String imgUrl) {
+    private void addPhotoToDatabase(String title, String description, String imgUrl, Location location) {
 
 
         // retrieve a unique key for the photo
@@ -233,6 +229,7 @@ public class FirebaseMethods {
         spot.setPhoto_id(photoKey);
         spot.setDate_created(getTimestamp());
         spot.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        spot.setLocation(location);
 
         Log.d(TAG, "addPhotoToDatabase: adding photo to database" + spot);
 

@@ -15,9 +15,10 @@ public class Spot implements Parcelable {
     private String user_id;
     private String tags;
     private List<Like> likes;
+    private Location location;
 
 
-    public Spot(String title, String description, String date_created, String image_path, String photo_id, String user_id, String tags, List<Like> likes) {
+    public Spot(String title, String description, String date_created, String image_path, String photo_id, String user_id, String tags, List<Like> likes, Location location) {
         this.title = title;
         this.description = description;
         this.date_created = date_created;
@@ -26,6 +27,7 @@ public class Spot implements Parcelable {
         this.user_id = user_id;
         this.tags = tags;
         this.likes = likes;
+        this.location = location;
     }
 
     public Spot() {
@@ -117,6 +119,14 @@ public class Spot implements Parcelable {
         this.likes = likes;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     @Override
     public String toString() {
         return "Spot{" +
@@ -128,6 +138,7 @@ public class Spot implements Parcelable {
                 ", user_id='" + user_id + '\'' +
                 ", tags='" + tags + '\'' +
                 ", likes=" + likes +
+                ", location=" + location +
                 '}';
     }
 
@@ -138,12 +149,6 @@ public class Spot implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeString(description);
-        dest.writeString(date_created);
-        dest.writeString(image_path);
-        dest.writeString(photo_id);
-        dest.writeString(user_id);
-        dest.writeString(tags);
+
     }
 }

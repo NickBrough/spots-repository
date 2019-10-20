@@ -34,6 +34,8 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     private Context mContext = HomeActivity.this;
 
+
+
     // firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -48,7 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_view);
         Log.d(TAG, "onCreate: Starting.");
 
-        mViewPager = (ViewPager) findViewById(R.id.viewpager_container);
+        mViewPager = findViewById(R.id.viewpager_container);
 
         setupFirebaseAuth();
         initImageLoader();
