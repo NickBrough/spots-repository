@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,6 +42,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nickb.spots.R;
 import com.nickb.spots.models.Location;
+
 import java.util.ArrayList;
 
 
@@ -46,6 +50,8 @@ import java.util.ArrayList;
 public class MapViewFragment extends Fragment {
 
     private static final String TAG = "MapViewFragment";
+
+
 
     MapView mMapView;
     private GoogleMap googleMap;
@@ -62,8 +68,6 @@ public class MapViewFragment extends Fragment {
 
         spotLocations = new ArrayList<>();
         mReference = FirebaseDatabase.getInstance().getReference();
-
-
 
         mMapView = view.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -110,6 +114,8 @@ public class MapViewFragment extends Fragment {
     }
 
 
+
+
     private void getMarkers() {
         Query query = mReference
                 .child(getString(R.string.dbname_spots))
@@ -126,8 +132,11 @@ public class MapViewFragment extends Fragment {
 
                     double latitude = (double) singleSnapshot.child(getString(R.string.field_location)).child(getString(R.string.field_latitude)).getValue();
                     double longitude = (double) singleSnapshot.child(getString(R.string.field_location)).child(getString(R.string.field_longitude)).getValue();
+                    String feature = (String) singleSnapshot.child(getString(R.string.field_location)).child(getString(R.string.field_feature)).getValue();
 
-                    Location location = new Location(latitude, longitude);
+
+
+                    Location location = new Location(latitude, longitude, feature);
                     spotLocations.add(location);
                 }
                 addMarkers(spotLocations);
@@ -146,7 +155,8 @@ public class MapViewFragment extends Fragment {
         for (int i = 0; i < spotLocations.size(); i++) {
             LatLng latLng = new LatLng(spotLocations.get(i).getLatitude(), spotLocations.get(i).getLongitude());
             googleMap.addMarker(new MarkerOptions()
-            .position(latLng));
+            .position(latLng))
+            .setTitle(spotLocations.get(i).getFeature());
         }
     }
 
@@ -173,7 +183,6 @@ public class MapViewFragment extends Fragment {
         super.onLowMemory();
         mMapView.onLowMemory();
     }
-
 
 }
 

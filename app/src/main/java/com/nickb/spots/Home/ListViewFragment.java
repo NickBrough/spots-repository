@@ -140,8 +140,9 @@ public class ListViewFragment extends Fragment {
 
                         double latitude = (double) locationMap.get(getString(R.string.field_latitude));
                         double longitude = (double) locationMap.get(getString(R.string.field_longitude));
+                        String feature = (String) locationMap.get(getString(R.string.field_feature));
 
-                        Location location = new Location(latitude, longitude);
+                        Location location = new Location(latitude, longitude, feature);
                         Log.d(TAG, "onDataChange: location: " + location);
 
                         spot.setLocation(location);

@@ -33,6 +33,7 @@
     <string name="field_location">location</string>
     <string name="field_latitude">latitude</string>
     <string name="field_longitude">longitude</string>
+    <string name="field_feature">feature</string>
 
 
 

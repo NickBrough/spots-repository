@@ -107,7 +107,7 @@ public class MainfeedListAdapter extends ArrayAdapter<Spot> {
         imageLoader.displayImage("file:/" + getItem(position).getImage_path(), holder.mImage);
         holder.mTitle.setText(getItem(position).getTitle());
         holder.mDescription.setText(getItem(position).getDescription());
-        holder.mLocation.setText(getItem(position).getLocation().toString());
+        holder.mLocation.setText(getItem(position).getLocation().getFeature());
 
 
         // get the user object

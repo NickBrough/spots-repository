@@ -165,6 +165,7 @@ public class UploadActivity extends AppCompatActivity {
             location = new Location();
             location.setLatitude(address.getLatitude());
             location.setLongitude(address.getLongitude());
+            location.setFeature(address.getFeatureName());
 
 //            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
         }
